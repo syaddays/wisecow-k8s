@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: wisecow
-          image: docker.io/syaddevops/wisecow:latest
+          image: IMAGE_PLACEHOLDER
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 4499
