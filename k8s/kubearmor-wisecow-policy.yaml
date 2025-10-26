@@ -1,0 +1,66 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+name: wisecow-zero-trust
+namespace: wisecow
+spec:
+# Apply to pods with label app: wisecow
+selector:
+matchLabels:
+app: wisecow
+
+
+# Block execution of interactive shells (prevent exec into container)
+process:
+- matchPaths:
+- path: "/bin/sh"
+- path: "/bin/bash"
+action: Block
+
+
+# Block creation or modification of files outside the /app directory
+file:
+- matchPaths:
+- path: "/"
+matchType: Prefix
+operations:
+- Write
+- Create
+- Append
+action: Block
+# Allow read access inside the application folder so app can function
+- matchPaths:
+- path: "/app"
+matchType: Prefix
+operations:
+- Read
+action: Allow
+
+
+# Deny all outbound network connections by default
+network:
+- direction: Out
+protocol: TCP
+destinationPorts:
+- "0:65535"
+action: Block
+
+
+# Allow the workload to accept incoming requests (Ingress) on the app port
+# Note: In Kubernetes typical ingress is handled by the controller; allow In traffic to listening port
+network:
+- direction: In
+protocol: TCP
+destinationPorts:
+- "4499"
+action: Allow
+
+
+# Block privilege escalation / sensitive capabilities
+capabilities:
+- cap: ALL
+action: Block
+
+
+# Policy enforcement mode
+action: Audit
