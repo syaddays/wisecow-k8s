@@ -63,4 +63,4 @@ action: Block
 
 
 # Policy enforcement mode
-action: Audit
+action: Block
